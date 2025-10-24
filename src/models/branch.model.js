@@ -42,6 +42,9 @@ const branchSchema = new Schema(
       type: Boolean,
       default: true, // true = active
     },
+    logo:{
+      type: String,
+    },
     remarks: {
       type: String,
       trim: true,

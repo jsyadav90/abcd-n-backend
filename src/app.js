@@ -21,11 +21,13 @@ app.get("/", (req, res) => {
 //Routes import
 
 import userRoutes from './routes/user.routes.js'
+import branchRoutes from './routes/branch.routes.js'
 
 
 // Router declaration
 
 app.use("/api/v1/users", userRoutes)
+app.use("/api/v1/branches", branchRoutes)
 
 
 export {app}

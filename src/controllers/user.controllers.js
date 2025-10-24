@@ -5,15 +5,15 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 
 const registerUser = asyncHandler(async (req, res) => {
-  // const admin = req.user; // from auth middleware
-  // if (!admin.branch) {
-  //   throw new apiError(400, "Admin branch not found");
-  // }
+  const admin = req.user; // from auth middleware
+  if (!admin.branch) {
+    throw new apiError(400, "Admin branch not found");
+  }
 
   // Check if admin has permission to create users
-  // if (!admin.can("users", "create")) {
-  //   throw new apiError(403, "You do not have permission to create users");
-  // }
+  if (!admin.can("users", "create")) {
+    throw new apiError(403, "You do not have permission to create users");
+  }
 
   const { fullName, username, password, email, phoneNo, department, designation, roleId } = req.body;
 
@@ -26,8 +26,8 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Find role object
-  // const role = await UserRole.findById(roleId);
-  // if (!role) throw new apiError(400, "Invalid role selected");
+  const role = await UserRole.findById(roleId);
+  if (!role) throw new apiError(400, "Invalid role selected");
 
   // Create user
   const newUser = await User.create({
