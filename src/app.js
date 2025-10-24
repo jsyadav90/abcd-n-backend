@@ -23,21 +23,9 @@ app.get("/", (req, res) => {
 import userRoutes from './routes/user.routes.js'
 
 
-
-
 // Router declaration
 
 app.use("/api/v1/users", userRoutes)
-
-
-
-
-
-
-
-
-
-
 
 
 export {app}
