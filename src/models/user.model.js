@@ -84,12 +84,35 @@ const userSchema = new Schema(
       type: String,
       select: false,
     },
+    isLoggedIn: {
+      type: Boolean,
+      default: false,
+    },
+
+    loggedInDevices: [
+      {
+        deviceId: { type: String, trim: true }, // UUID or browser fingerprint
+        ipAddress: { type: String, trim: true },
+        userAgent: { type: String, trim: true },
+        loginHistory: [
+          {
+            loginAt: { type: Date, default: Date.now },
+            logoutAt: { type: Date },
+          },
+        ],
+        loginCount: { type: Number, default: 0 }, // Total logins on this device
+        refreshToken: { type: String }, // Per-device refresh token
+      },
+    ],
+    maxAllowedDevices: { type: Number, default: 2 },
+    failedLoginAttempts: { type: Number, default: 0 },
+    lockUntil: { type: Date },
+
     // Audit fields
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
     updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
     lastLogin: { type: Date },
-    failedLoginAttempts: { type: Number, default: 0 },
-    lockUntil: { type: Date },
+    
   },
   {
     timestamps: true,
@@ -143,11 +166,9 @@ userSchema.methods.generateAccessToken = function () {
 // Refresh Token
 //////////////////////////////
 userSchema.methods.generateRefreshToken = async function () {
-  const token = jwt.sign(
-    { id: this._id },
-    process.env.REFRESH_TOKEN_KEY,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
-  );
+  const token = jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN_KEY, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+  });
   this.refreshToken = token;
   await this.save();
   return token;

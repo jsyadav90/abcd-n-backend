@@ -20,7 +20,7 @@ const userRoleSchema = new Schema(
       {
         module: {
           type: String, // e.g. "inventory", "users", "finance"
-          required: true,
+          // required: true,
           lowercase: true,
           trim: true,
         },
@@ -39,15 +39,15 @@ const userRoleSchema = new Schema(
       default: true, // true = active role
     },
 
-    createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
+    // createdBy: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: "User",
+    // },
 
-    updatedBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
+    // updatedBy: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: "User",
+    // },
   },
   {
     timestamps: true,
