@@ -23,14 +23,14 @@ const userRoleSchema = new Schema(
           // required: true,
           lowercase: true,
           trim: true,
+          actions: [
+            {
+              type: String, // e.g. "view", "create", "edit", "delete", "export"
+              lowercase: true,
+              trim: true,
+            },
+          ],
         },
-        actions: [
-          {
-            type: String, // e.g. "view", "create", "edit", "delete", "export"
-            lowercase: true,
-            trim: true,
-          },
-        ],
       },
     ],
 
@@ -39,15 +39,15 @@ const userRoleSchema = new Schema(
       default: true, // true = active role
     },
 
-    // createdBy: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: "User",
-    // },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
 
-    // updatedBy: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: "User",
-    // },
+    updatedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,

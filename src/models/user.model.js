@@ -20,19 +20,12 @@ const userSchema = new Schema(
     },
     username: {
       type: String,
-      unique: true,
       trim: true,
       lowercase: true,
-      required: function () {
-        return this.canLogin === true;
-      },
+     
     },
     password: {
       type: String,
-      required: function () {
-        return this.canLogin === true;
-      },
-      select: false,
     },
     email: {
       type: String,
@@ -47,13 +40,16 @@ const userSchema = new Schema(
       match: [/^[0-9+\-()\s]*$/, "Invalid phone number format"],
     },
     role: {
-      type: Schema.Types.ObjectId,
-      ref: "UserRole",
+      // type: Schema.Types.ObjectId,
+      // ref: "UserRole",
+      type: String,
       required: true,
+      default : "user"
     },
     branch: {
-      type: Schema.Types.ObjectId,
-      ref: "Branch",
+      // type: Schema.Types.ObjectId,
+      // ref: "Branch",
+      type: String,
       required: true,
     },
     department: {
@@ -127,9 +123,24 @@ const userSchema = new Schema(
   }
 );
 
+// ✅ Extra validation layer only when saving
+userSchema.pre("validate", function (next) {
+  if (this.canLogin === true) {
+    if (!this.username) {
+      return next(new Error("Username is required when login is allowed"));
+    }
+    if (!this.password) {
+      return next(new Error("Password is required when login is allowed"));
+    }
+  }
+  next();
+
+});
+
 //////////////////////////////
 // Password Hashing
 //////////////////////////////
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password") || !this.password) return next();
   this.password = await bcrypt.hash(this.password, 10);
