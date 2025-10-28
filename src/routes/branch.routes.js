@@ -8,90 +8,29 @@ import {
   deleteBranch,
   toggleBranchStatus,
 } from "../controllers/branch.controllers.js";
+import { authenticateJWT } from "../middlewares/auth.middleware.js";
+import { isEnterpriseAdmin } from "../middlewares/enterpriseAdmin.middleware.js";
 
 const router = express.Router();
 
-// ==============================
-// Branch Routes (No Authentication)
-// ==============================
+// ✅ Create a new branch (requires login + admin)
+router
+  .route("/create")
+  .post(authenticateJWT, isEnterpriseAdmin, upload.single("logo"), createBranch);
 
-// Create a new branch
-router.route("/create").post(upload.single("logo"),createBranch);
-
-// Get all branches
+// ✅ View all branches (public)
 router.route("/allbranches").get(getAllBranches);
 
-// Get, Update, Delete a single branch by ID
+// ✅ Get, Update, Delete single branch
 router
   .route("/:id")
   .get(getBranchById)
-  .put(updateBranch)
-  .delete(deleteBranch);
+  .put(authenticateJWT, isEnterpriseAdmin, updateBranch)
+  .delete(authenticateJWT, isEnterpriseAdmin, deleteBranch);
 
-// Toggle branch status (active/inactive)
-router.route("/:id/toggle-status").patch(toggleBranchStatus);
+// ✅ Toggle branch status (admin only)
+router
+  .route("/:id/toggle-status")
+  .patch(authenticateJWT, isEnterpriseAdmin, toggleBranchStatus);
 
 export default router;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import express from "express";
-// import {
-//   createBranch,
-//   getAllBranches,
-//   getBranchById,
-//   updateBranch,
-//   deleteBranch,
-//   toggleBranchStatus,
-// } from "../controllers/branch.controller.js";
-// import { authenticateJWT } from "../middlewares/auth.middleware.js";
-
-// const router = express.Router();
-
-// // ==============================
-// // Branch Routes
-// // ==============================
-
-// // Create a new branch (only authenticated admins)
-// router.route("/").post(authenticateJWT, createBranch);
-
-// // Get all branches (authenticated users)
-// router.route("/").get(authenticateJWT, getAllBranches);
-
-// // Get, Update, Delete a single branch by ID
-// router
-//   .route("/:id")
-//   .get(authenticateJWT, getBranchById)
-//   .put(authenticateJWT, updateBranch)
-//   .delete(authenticateJWT, deleteBranch);
-
-// // Toggle branch status (active/inactive)
-// router.route("/:id/toggle-status").patch(authenticateJWT, toggleBranchStatus);
-
-// export default router;

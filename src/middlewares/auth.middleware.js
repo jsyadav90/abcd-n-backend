@@ -8,6 +8,7 @@ import { apiError } from "../utils/apiError.js";
  */
 const authenticateJWT = async (req, res, next) => {
   try {
+    console.log("🔐 Running authenticateJWT...");
     let token;
 
     // ✅ 1️⃣ Try from "Authorization" header
