@@ -14,7 +14,8 @@ const userRoleSchema = new Schema(
       type: String,
       trim: true,
     },
-
+     level: { type: Number, required: true }, // 1=Enterprise, 2=Super, 3=Admin, 4=User, 5=Custom
+     
     // Define system-level permissions or access modules
     permissions: [
       {
@@ -25,7 +26,7 @@ const userRoleSchema = new Schema(
           trim: true,
           actions: [
             {
-              type: String, // e.g. "view", "create", "edit", "delete", "export"
+              type: [String], // e.g. "view", "create", "edit", "delete", "export"
               lowercase: true,
               trim: true,
             },

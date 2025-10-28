@@ -2,6 +2,8 @@ import mongoose, { Schema } from "mongoose";
 
 const branchSchema = new Schema(
   {
+    group: { type: Schema.Types.ObjectId, ref: "Group", required: true },
+    
     branchCode: {
       type: String,
       trim: true,
@@ -42,7 +44,7 @@ const branchSchema = new Schema(
       type: Boolean,
       default: true, // true = active
     },
-    logo:{
+    logo: {
       type: String,
     },
     remarks: {

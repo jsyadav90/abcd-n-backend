@@ -20,15 +20,15 @@ export const loginUser = async (req, res) => {
       return res.status(403).json({ message: "Account locked due to failed login attempts. Try later." });
     }
 
-    // const isMatch = await user.comparePassword(password);
-    // if (!isMatch) {
-    //   user.failedLoginAttempts += 1;
-    //   if (user.failedLoginAttempts >= 5) {
-    //     user.lockUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 min lock
-    //   }
-    //   await user.save();
-    //   return res.status(401).json({ message: "Invalid credentials" });
-    // }
+   const isMatch = await user.comparePassword(password);
+if (!isMatch) {
+  user.failedLoginAttempts += 1;
+  if (user.failedLoginAttempts >= 5) {
+    user.lockUntil = new Date(Date.now() + 15 * 60 * 1000);
+  }
+  await user.save();
+  return res.status(401).json({ message: "Invalid credentials too" });
+}
 
     // Reset failed attempts
     user.failedLoginAttempts = 0;
@@ -125,38 +125,34 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     const { userId, deviceId } = req.body;
+
     if (!userId || !deviceId)
       return res.status(400).json({ message: "userId and deviceId required" });
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Find device
-    const device = user.loggedInDevices.find(d => d.deviceId === deviceId);
-    if (!device) return res.status(404).json({ message: "Device not found" });
+    const device = user.loggedInDevices.find((d) => d.deviceId === deviceId);
+    if (!device)
+      return res.status(404).json({ message: "Device not found" });
 
-    // Safely mark last session logout
-    const lastSession = device.loginHistory && device.loginHistory.length
-      ? device.loginHistory[device.loginHistory.length - 1]
-      : null;
+    // ✅ Mark last session logout
+    if (device.loginHistory?.length) {
+      const last = device.loginHistory[device.loginHistory.length - 1];
+      if (!last.logoutAt) last.logoutAt = new Date();
+    }
 
-    if (lastSession && !lastSession.logoutAt) lastSession.logoutAt = new Date();
-
-    // Clear device refresh token
     device.refreshToken = null;
 
-    // Update isLoggedIn if any active device exists
-    const anyActiveDevice = user.loggedInDevices.some(
-      d =>
-        d.loginHistory &&
-        d.loginHistory.length &&
-        !d.loginHistory[d.loginHistory.length - 1].logoutAt
+    // ✅ Check if any active session left
+    const hasActive = user.loggedInDevices.some((d) =>
+      d.loginHistory?.some((s) => !s.logoutAt)
     );
-    user.isLoggedIn = anyActiveDevice;
+    user.isLoggedIn = hasActive;
 
-    await user.save();
+    await user.save({ validateBeforeSave: false });
 
-    // Clear cookies
+    // ✅ Clear cookies properly
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
 
@@ -166,4 +162,5 @@ export const logoutUser = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 

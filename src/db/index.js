@@ -4,7 +4,7 @@ import { app } from "../app.js";
 
 const connectDB = async () => {
   try {
-    const connectionInstance =  await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
+    const connectionInstance =  await mongoose.connect(`${process.env.MONGO_DB_URI}/${DB_NAME}`)
     app.on("error", (error)=>{
       console.log(`err:`, error);
       throw error

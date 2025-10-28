@@ -22,7 +22,7 @@ const userSchema = new Schema(
       type: String,
       trim: true,
       lowercase: true,
-     
+     sparse: true, 
     },
     password: {
       type: String,
